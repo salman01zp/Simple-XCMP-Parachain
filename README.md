@@ -1,7 +1,7 @@
 # Simple-XCMP-Parachain
 
 This is a  project for learning exploring blockchain runtime development with
-[Substrate](https://substrate.dev/) [Cumulus Parachain]() and the
+[Substrate](https://substrate.dev/),  [Cumulus Parachain](https://github.com/paritytech/cumulus) and the
 [FRAME](https://substrate.dev/docs/en/knowledgebase/runtime/frame). 
 
 This project implements a simple  XCMP protocol between two parachains where one parachain makes pallet call of another parachain.
