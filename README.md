@@ -24,7 +24,7 @@ $ ./target/release/polkadot --help
 - Generate relay chain spec file.
 There must be minimum 2 validator for 1 parachain. In this project we will be using two parachains , so therefore we will require 3 validator nodes
 Check here to learn more [here](https://docs.substrate.io/v3/runtime/chain-specs/).
-```rust
+```sh
 ./target/release/polkadot build-spec \
 --chain rococo-local \
 --raw \
@@ -36,7 +36,7 @@ You can use pre configured chain spec file for testing from [here]()
 
 ### Start relay node with 3 validator Alice, Bob and Charlie
 - Alice
-```rust
+```sh
 ./target/release/polkadot \
 --alice \
 --validator \
@@ -47,7 +47,7 @@ You can use pre configured chain spec file for testing from [here]()
 ```
 
 - Bob
-```rust
+```sh
 ./target/release/polkadot \
 --bob \  
 --validator \
@@ -59,7 +59,7 @@ You can use pre configured chain spec file for testing from [here]()
 ```
 
 - Charlie
-```rust
+```sh
 ./target/release/polkadot \
 --charlie \
 --validator \
