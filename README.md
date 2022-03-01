@@ -49,7 +49,7 @@ You can use pre configured chain spec file for testing from [here]()
 - Bob
 ```sh
 ./target/release/polkadot \
---bob \  
+--bob \
 --validator \
 --base-path /tmp/relay-bob \
 --chain ./rococo-custom-3-raw.json \
@@ -73,3 +73,60 @@ You can use pre configured chain spec file for testing from [here]()
 
 ## Step2 Build Parachain
 
+### Reserve Parachain ID
+	Resure Parachain ID using [Polkadot-js](https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944#/parachains/parathreads)
+	Parachain ids start with 2000
+
+### Configure Parachain for Relay chain and Para ID
+
+	- Generate Plain spec with:
+	```sh
+	./target/release/parachain-collator build-spec --disable-default-bootnode > rococo-local-parachain-plain.json
+	```
+
+	- Update Para ID in Plain Spec file
+	```rust
+		// --snip--
+			"para_id": 2000, // <--- your already registered ID
+			// --snip--
+				"parachainInfo": {
+					"parachainId": 2000 // <--- your already registered ID
+      },
+  		// --snip--
+	```
+
+	- Generate Raw spec file from Plain Spec file
+	```sh
+	./target/release/parachain-collator build-spec --chain rococo-local-parachain-plain.json --raw --disable-default-bootnode > rococo-local-parachain-2000-raw.json
+	```
+
+	- Generate Wasm runtime blob
+	```sh
+	./target/release/parachain-collator export-genesis-wasm --chain rococo-local-parachain-2000-raw.json > para-2000-wasm
+	```
+
+	- Generate Parachain Genesis State (hex encoded)
+	```sh
+	./target/release/parachain-collator export-genesis-state --chain rococo-local-parachain-2000-raw.json > para-2000-genesis
+	```
+
+	- Start Collator Node
+	```sh
+		./target/release/parachain-collator \
+		--alice \
+		--collator \
+		--force-authoring \
+		--chain rococo-local-parachain-2000-raw.json \
+		--base-path /tmp/parachain1/alice \
+		--port 40333 \
+		--ws-port 8844 \
+		-- \
+		--execution wasm \
+		--chain ./rococo-custom-3-raw.json \
+		--bootnodes /ip4/127.0.0.1/tcp/30333/p2p/<Bootnode Identifier> \
+		--port 30343 \
+		--ws-port 9977
+	```
+
+	- Second Parachain
+	Repeat All the above steps with different Para ID, base path and ports. Use same relay chain spec.
