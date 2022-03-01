@@ -454,11 +454,20 @@ match_type! {
 	};
 }
 
+match_type!{
+	pub type SpecParachain: impl Contains<MultiLocation> = {
+		MultiLocation { parents:1, interior: Junctions::X1(Parachain(2000)) }|
+		MultiLocation { parents:1, interior: Junctions::X1(Parachain(2001)) }
+
+	};
+}
+
 pub type Barrier = (
 	TakeWeightCredit,
 	AllowTopLevelPaidExecutionFrom<Everything>,
 	AllowUnpaidExecutionFrom<ParentOrParentsExecutivePlurality>,
 	// ^^^ Parent and its exec plurality get free execution
+	AllowUnpaidExecutionFrom<SpecParachain>,
 );
 
 pub struct XcmConfig;
