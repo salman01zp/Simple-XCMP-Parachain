@@ -1,6 +1,38 @@
-# Simple-XCMP-Counter
-Simple XCMP application to set and update counter of different parachain
+# Simple-XCMP-Parachain
 
+This is a  project for learning exploring blockchain runtime development with
+[Substrate](https://substrate.dev/) [Cumulus Parachain]() and the
+[FRAME](https://substrate.dev/docs/en/knowledgebase/runtime/frame). 
+
+This project implements a simple  XCMP protocol between two parachains where one parachain makes pallet call of another parachain.
+
+
+## pallet-counter Design
+This pallet defines a simple logic to set , increment and make xcm calls. Same pallet is used on both the parachain for testing xcmp functionality.
+
+Requirements
+- Follow Below steps to set up Relay Node and Parachain Node
+- Only sudo user can make pallet call
+- Build HRMP channel between( Parachain(2000) , Parachain(2001))
+
+### Pallet Calls
+- `set_counter(origin, para, value)`
+set_counter method takes paraid and value as input and makes set_counter_value() pallet call of Parachain(paraID) by sending xcm message
+
+- `increment_counter(origin,para)`
+increment_counter method takes paraId and makes increment_counter_value() pallet call of Parachain(ParaId) by sending xcm message
+
+### Storages
+-`Counter: StorageValue => u32`
+
+### Events
+- `CounterSet(ParaId, u32)`
+- `CounterIncremented(ParaId)`
+
+### Errors
+- `ErrorSettingCounter`
+- `ErrorIncrementingCounter`
+- 
 ## Step1 Building the relay Chain node.
 
 ```sh
