@@ -17,10 +17,12 @@ Requirements
 
 ### Pallet Calls
 - `set_counter(origin, para, value)`
-set_counter method takes paraid and value as input and makes set_counter_value() pallet call of Parachain(paraID) by sending xcm message
+
+set_counter method takes paraid and value as input and makes set_counter_value() pallet call of Parachain(paraID) by sending xcm message.
 
 - `increment_counter(origin,para)`
-increment_counter method takes paraId and makes increment_counter_value() pallet call of Parachain(ParaId) by sending xcm message
+
+increment_counter method takes paraId and makes increment_counter_value() pallet call of Parachain(ParaId) by sending xcm message.
 
 ### Storages
 - `Counter: StorageValue => u32`
