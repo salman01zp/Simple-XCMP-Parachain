@@ -60,6 +60,9 @@ use xcm_executor::{Config, XcmExecutor};
 /// Import the template pallet.
 pub use pallet_template;
 
+/// Import counter pallet
+pub use pallet_counter;
+
 /// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
 pub type Signature = MultiSignature;
 
@@ -592,6 +595,14 @@ impl pallet_template::Config for Runtime {
 	type Event = Event;
 }
 
+/// Configure the pallet counter in pallets/counter.
+impl pallet_counter::Config for Runtime {
+	type Event = Event;
+	type Origin = Origin;
+	type Call = Call;
+	type XcmSender = XcmRouter;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime where
@@ -626,6 +637,8 @@ construct_runtime!(
 
 		// Template
 		TemplatePallet: pallet_template::{Pallet, Call, Storage, Event<T>}  = 40,
+		CounterBot: pallet_counter::{Pallet, Call, Storage, Event<T>}  = 41,
+
 	}
 );
 
