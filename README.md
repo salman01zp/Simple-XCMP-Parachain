@@ -23,7 +23,7 @@ set_counter method takes paraid and value as input and makes set_counter_value()
 increment_counter method takes paraId and makes increment_counter_value() pallet call of Parachain(ParaId) by sending xcm message
 
 ### Storages
--`Counter: StorageValue => u32`
+- `Counter: StorageValue => u32`
 
 ### Events
 - `CounterSet(ParaId, u32)`
