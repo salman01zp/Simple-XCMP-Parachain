@@ -47,7 +47,9 @@ use frame_support::{dispatch::DispatchResultWithPostInfo, pallet_prelude::*};
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
 		CounterSet(ParaId,u32),
-		ErrorSettingCounter(SendError,ParaId,u32)
+		ErrorSettingCounter(SendError,ParaId,u32),
+		CounterIncremented(ParaId),
+		ErrorIncrementingCounter(SendError,ParaId),
 
 	}
 
@@ -65,14 +67,17 @@ use frame_support::{dispatch::DispatchResultWithPostInfo, pallet_prelude::*};
 	impl<T: Config> Pallet<T> {
 
 		#[pallet::weight(1000 + T::DbWeight::get().writes(1))]
-		pub fn start(origin: OriginFor<T>, para: ParaId, value: u32) -> DispatchResultWithPostInfo {
+		pub fn set_counter(origin: OriginFor<T>, para: ParaId, value: u32) -> DispatchResultWithPostInfo {
+			// Set counter of Parachain Id: <ParaId> to value : <value>
+			// by sending Xcm call to parachain
+
 			ensure_root(origin)?;
 			match T::XcmSender::send_xcm(
 			(1, Junction::Parachain(para.into())),
 			Xcm(vec![Transact {
 						origin_type: OriginKind::Native,
 						require_weight_at_most: 1_000,
-						call: <T as Config>::Call::from(Call::<T>::set_counter {
+						call: <T as Config>::Call::from(Call::<T>::set_counter_value {
 							value
 
 						})
@@ -80,13 +85,6 @@ use frame_support::{dispatch::DispatchResultWithPostInfo, pallet_prelude::*};
 						.into(),
 					}]),
 				)
-
-			// 	Xcm::Transact {
-			// 		origin_type: OriginKind::Native,
-			// 		require_weight_at_most: 1_000,
-			// 		call: <T as Config>::Call::from(Call::<T>::set_counter{value}).encode().into(),
-			// 	},
-			// )
 			{
 				Ok(()) => {
 					Self::deposit_event(Event::CounterSet(para,value));
@@ -99,12 +97,52 @@ use frame_support::{dispatch::DispatchResultWithPostInfo, pallet_prelude::*};
 			Ok(().into())
 		}
 
+
+		#[pallet::weight(1000 + T::DbWeight::get().writes(1))]
+		pub fn increment_counter(origin: OriginFor<T>, para: ParaId) -> DispatchResultWithPostInfo {
+			// Increment Counter value of parachain Id: <ParaId> with plus 1
+			// by sending Xcm call to parachain::pallet::call
+
+			ensure_root(origin)?;
+			match T::XcmSender::send_xcm(
+			(1, Junction::Parachain(para.into())),
+			Xcm(vec![Transact {
+						origin_type: OriginKind::Native,
+						require_weight_at_most: 1_000,
+						call: <T as Config>::Call::from(Call::<T>::increment_counter_value{}).encode().into(),
+					}]),
+				)
+			{
+				Ok(()) => {
+					Self::deposit_event(Event::CounterIncremented(para));
+				},
+				Err(e) => {
+					Self::deposit_event(Event::ErrorIncrementingCounter(e, para));
+				}
+			}
+
+			Ok(().into())
+		}
+
 		#[pallet::weight(1000)]
-		pub fn set_counter(origin: OriginFor<T>,value: u32)-> DispatchResult {
+		pub fn set_counter_value(origin: OriginFor<T>,value: u32)-> DispatchResult {
 			let para = ensure_sibling_para(<T as Config>::Origin::from(origin))?;
-			// Update storage.
+			// Update Counter Value.
 			<Counter<T>>::put(value);
 			Self::deposit_event(Event::CounterSet(para, value));
+			Ok(())
+		}
+
+		#[pallet::weight(1000)]
+		pub fn increment_counter_value(origin: OriginFor<T>)-> DispatchResult {
+			let para = ensure_sibling_para(<T as Config>::Origin::from(origin))?;
+			// Increment Counter with plus 1
+			let count= Counter::<T>::mutate(|cnt| {
+				*cnt += 1;
+				*cnt
+			});
+			<Counter<T>>::put(count);
+			Self::deposit_event(Event::CounterIncremented(para));
 			Ok(())
 		}
 
